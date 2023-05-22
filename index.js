@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-         client.connect();
+        client.connect();
 
         const toyCollection = client.db("toyDB").collection("toy");
         const toyCatagory = client.db("toyDB").collection("toyCatagory");
@@ -41,11 +41,11 @@ async function run() {
         app.get('/subCatagory/:text', async (req, res) => {
             console.log(req.params.text);
             if (req.params.text == "Implement" || req.params.text == "EngTools" || req.params.text == "Architecture") {
-                const cursor = toyCollection.find({category: req.params.text});
+                const cursor = toyCollection.find({ category: req.params.text });
                 const result = await cursor.toArray();
                 return res.send(result)
             }
-            const cursor = toyCollection.find(); 
+            const cursor = toyCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -62,10 +62,12 @@ async function run() {
         })
 
         app.get('/toy', async (req, res) => {
+            const limits = parseInt (req.query.limit)
             const cursor = toyCollection.find();
-            const result = await cursor.toArray();
+            const result = await cursor.limit(limits).toArray();
             res.send(result);
         });
+
         app.get('/category', async (req, res) => {
             const cursor = toyCatagory.find();
             const result = await cursor.toArray();
@@ -81,7 +83,7 @@ async function run() {
 
         app.get("/myToys/:email", async (req, res) => {
             const result = await toyCollection
-                .find({ supplier: req.params.email })
+                .find({ supplier: req.params.email }).sort({price: 1})
                 .toArray();
             res.send(result);
         })
@@ -116,6 +118,7 @@ async function run() {
 
         app.post('/toy', async (req, res) => {
             const newToy = req.body;
+            newToy.createdAt= new Date ()
             // console.log(newToy);
             const result = await toyCollection.insertOne(newToy);
             res.send(result);
