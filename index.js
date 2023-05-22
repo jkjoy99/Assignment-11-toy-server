@@ -61,7 +61,7 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/')
+        
 
         app.get('/toy', async (req, res) => {
             const limits = parseInt (req.query.limit)
